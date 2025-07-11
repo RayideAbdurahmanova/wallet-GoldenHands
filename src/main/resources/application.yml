@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: wallet-ms
+  datasource:
+    url: jdbc:mysql://localhost:3306/wallet
+    username: root
+    password: java123
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+
+    properties:
+      hibernate:
+        format_sql: true
+      logging:
+        level:
+          org.hibernate.SQL: DEBUG
+          org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+secret:
+  key: 4d6b7e9f2a3c8b1d5e7f9a0c2b4d6e8f1a3c5e7f9b0d2f4a6c8e0b1d3f5a7c9
