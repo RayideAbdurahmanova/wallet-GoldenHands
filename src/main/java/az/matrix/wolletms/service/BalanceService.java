@@ -38,14 +38,7 @@ public class BalanceService {
             }
         }
         currentBalance = currentBalance.add(createBalanceRequest.getAmount());
-        Balance newBalance = new Balance();
-        newBalance.setAmount(createBalanceRequest.getAmount());
-        newBalance.setUpdated(LocalDateTime.now());
-        newBalance.setUserId(userId);
-        newBalance.setDate(LocalDateTime.now());
-        newBalance.setCurrency(Currency.AZN);
-        newBalance.setPaymentMethod(PaymentMethod.CARD);
-        newBalance.setTotalBalance(currentBalance);
+        Balance newBalance = balanceMapper.mapToBalance(createBalanceRequest,userId,currentBalance);
         balanceRepository.save(newBalance);
     }
 

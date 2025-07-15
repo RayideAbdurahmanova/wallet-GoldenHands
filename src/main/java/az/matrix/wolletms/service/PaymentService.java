@@ -1,10 +1,14 @@
 package az.matrix.wolletms.service;
 
+import az.matrix.wolletms.dto.BalanceDto;
+import az.matrix.wolletms.dto.CreateBalanceRequest;
 import az.matrix.wolletms.dto.PaymentRequest;
 import az.matrix.wolletms.entity.Balance;
 import az.matrix.wolletms.entity.Payment;
 import az.matrix.wolletms.exceptions.DataNotFoundException;
 import az.matrix.wolletms.filter.JwtService;
+import az.matrix.wolletms.mapper.BalanceMapper;
+import az.matrix.wolletms.mapper.PaymentMapper;
 import az.matrix.wolletms.repository.BalanceRepository;
 import az.matrix.wolletms.repository.PaymentRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +33,8 @@ public class PaymentService {
     private final JwtService jwtService;
     private final BalanceRepository balanceRepository;
     private final PaymentRepository paymentRepository;
+    private final BalanceMapper balanceMapper;
+    private final PaymentMapper paymentMapper;
 
     @Transactional
     public void pay(HttpServletRequest req, PaymentRequest paymentRequest) {
@@ -44,24 +50,14 @@ public class PaymentService {
             throw new DataNotFoundException("Not enough balance");
         }
         var lastTotalBalance = balanceEntity.getTotalBalance();
-        Balance updatedBalance = new Balance();
-        updatedBalance.setUserId(userId);
-        updatedBalance.setTotalBalance(lastTotalBalance);
-        updatedBalance.setUpdated(LocalDateTime.now());
-        updatedBalance.setAmount(paymentRequest.getAmount());
-        updatedBalance.setDate(LocalDateTime.now());
-        updatedBalance.setCurrency(AZN);
-        updatedBalance.setPaymentMethod(CARD);
+        CreateBalanceRequest createBalanceRequest=new CreateBalanceRequest();
+        createBalanceRequest.setAmount(paymentRequest.getAmount());
+        Balance updatedBalance = balanceMapper.mapToBalance(createBalanceRequest,userId,lastTotalBalance);
+
         balanceRepository.save(updatedBalance);
 
-        Payment payment = new Payment();
-        payment.setAmount(paymentRequest.getAmount());
-        payment.setUserId(Long.valueOf(userId));
-        payment.setDate(LocalDateTime.now());
-        payment.setUpdated(LocalDateTime.now());
-        payment.setCurrency(AZN);
-        payment.setStatus(PENDING);
-        payment.setPaymentMethod(CARD);
+        Payment payment = paymentMapper.mapToPayment(paymentRequest, Long.valueOf(userId));
+
         paymentRepository.save(payment);
     }
 
